@@ -1,3 +1,250 @@
 * {
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
+
+html {
+	height: 100%;
+}
+
+body {
+	color: white;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-rows: auto 5rem;
+}
+
+header {
+	grid-row: 2 / -1;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: #0072ce;
+	background: -webkit-linear-gradient(
+		to right,
+		#005eb8,
+		#0072ce
+	); /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(
+		to right,
+		#005eb8,
+		#0072ce
+	); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	box-shadow: 0px 2px 10px 0px rgba(0, 114, 206, 0.44);
+	padding: 0.8rem;
+	transition: all 0.5s ease;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 10;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
+		'Helvetica', Arial, sans-serif;
+	font-weight: 800;
+	letter-spacing: 0;
+}
+
+h1 {
+	vertical-align: middle;
+	margin: 0;
+}
+
+input:focus {
+	outline-color: #0072ce;
+}
+
+.landing {
+	background: #0072ce;
+	background: -webkit-linear-gradient(
+		to right,
+		#005eb8,
+		#0072ce
+	); /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(
+		to right,
+		#005eb8,
+		#0072ce
+	); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	height: 100%;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	grid-row: 1 / 2;
+	transition: all 0.6s ease;
+}
+
+.landing--container {
+	background: #f5f6fa;
+	border-radius: 0.8rem;
+	width: 50vw;
+	height: 62%;
+	z-index: 1;
+	box-shadow: 0 3px 1px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	overflow: hidden;
+}
+
+.landing--container:hover {
+	transform: scale(1.05);
+}
+
+.landing__title {
+	display: inline-block;
+	color: #0072ce;
+	padding: 1rem 1.5rem;
+	font-size: 3.2rem;
+	margin-bottom: 0.5rem;
+}
+
+.landing__form {
+	font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
+		'Helvetica', Arial, sans-serif;
+}
+
+.landing__form--container {
+	transition: transform 0.6s ease-out;
+}
+
+.landing__form--container.located {
+	transform: rotateX(90deg);
+}
+
+.landing__form input, .header__symptoms {
+	width: 80%;
+	background: #fff;
+	color: #0072ce;
+	font: inherit;
+	box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.1);
+	border: 0;
+	outline: 0;
+	padding: 22px 18px;
+	margin: 1rem 2rem 0.4rem;
+	border-radius: 6px;
+}
+
+.landing__form button {
+	display: block;
+	background: #0072ce;
+	color: white;
+	font: inherit;
+	border: none;
+	border-radius: 4px;
+	padding: 10px 25px;
+	transition: background 200ms ease-in, transform 0.4s ease-out 80ms;
+	cursor: pointer;
+	text-transform: uppercase;
+	font-weight: 400;
+	margin: 1rem auto 0;
+}
+
+.landing__form button:hover {
+	background: #005eb8;
+}
+
+.landing__form__info {
+	display: flex;
+	padding: 0.2rem 1.5rem 0.8rem;
+	color: #bdc3c7;
+	align-items: center;
+}
+
+.landing__form__info svg {
+	fill: #bdc3c7;
+}
+
+.landing__form__info p {
+	margin: 0;
+	margin-left: 0.4rem;
+	font-weight: 500;
+}
+
+.logo:hover {
+	cursor: pointer;
+}
+
+.logo:hover .logo__img {
+	animation: spin 3s infinite linear;
+}
+
+@keyframes spin {
+	from  {
+		transform: rotate(0deg);
+	} to {
+		transform: rotate(360deg);
+	}
+}
+
+.logo__img {
+	fill: white;
+	vertical-align: middle;
+}
+
+.logo__title {
+	display: inline-block;
+}
+
+.attribution {
+	display: flex;
+	align-items: center;
+}
+
+.attribution__text {
+	color: #f5f6fa;
+	font-weight: 200;
+	text-transform: uppercase;
+	display: inline-block;
+	margin: 0;
+	margin-right: 0.2rem;
+}
+
+.attribution svg {
+	margin: 0 0.35rem;
+	width: 3.5rem;
+	height: 3.5rem;
+}
+
+.attribution__gmaps {
+	width: 2rem !important;
+}
+
+.attribution__link {
+	transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.attribution__link:hover {
+	transform: scale(1.1);
+}
+
+.header__symptoms {
+	font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto',
+		'Helvetica', Arial, sans-serif;
+	width: 45%;
+	margin: 0;
+	padding: 1rem;
+	display: none;
+}
+
+.gmap {
+	height: 100%;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+
+#map {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
