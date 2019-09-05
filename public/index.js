@@ -69,23 +69,8 @@ function initMap() {
 	});
 }
 
-// async function getSymptomList() {
-//     const nhsAllConditionsEndpoint = 'https://api.nhs.uk/conditions/'
-//     const options = {
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'subscription-key': 'ce8c296627214e63a94bd57055361c17'
-//         }
-//     }
-//     const response = await fetch(nhsAllConditionsEndpoint, options);
-// 	const data = await response.json();
-// 	const allSymptoms = data.significantLink;
-//     console.log(allSymptoms);
-// }
-
-// getSymptomList();
-
 //Grabs data from CSV file and adds it to symptoms array
+let symptomsAndLinks = [];
 let symptoms = [];
 
 async function getSymptomList() {
@@ -93,7 +78,10 @@ async function getSymptomList() {
 	const data = await response.text();
 	const list = data.split('\n');
 
-	symptoms = list.map(el => el.replace(/[, ]+/g, ' ').trim());
+	symptomsAndLinks = list;
+	symptoms = list.map(el => el.replace(/,\/.+/g, ' ').trim());
+	console.log(symptomsAndLinks);
+	console.log(symptoms)
 }
 
 getSymptomList();
@@ -146,7 +134,36 @@ function grabSymptomSearch() {
 
 	symptomSearches.forEach(symptomSearch =>
 		symptomSearch.addEventListener('click', function(e) {
-			console.log(e.target.innerText);
+			//set search bar value to whatever was clicked
+			document.getElementById('symptoms-header').value = e.target.innerText;
+			//remove dropdown list 
+			document.querySelector('.symptom__list').innerHTML = '';
+			
+			//Grab condition from search bar 
+			const condition = e.target.innerText;
+			console.log(condition);
+			//Grab the conditions associated link
+			const conditionWithLink = symptomsAndLinks.filter(el => el.includes(`${condition}`));
+
+			//If an associated link is not found then search input value is sent to the server as the link
+			let link;
+			if (conditionWithLink.length > 0) {
+				link = /\/.+/g.exec(conditionWithLink)[0];
+			} else {
+				link = `conditions/${e.target.innerText.toLowerCase().split(' ').join('-')}`;
+			}
+
+			//Post data to the server
+			const data = { condition, link };
+
+			fetch('/api', {
+				method: 'POST',
+				headers: {
+					"Content-Type": 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+
 		})
 	);
 }
