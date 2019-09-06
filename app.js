@@ -39,7 +39,22 @@ app.post('/api', (request, response) => {
 	console.log(request.body);
 	//Grab condition from the body and replace white spaces with hyphens
 	condition = request.body.link;
-	console.log(condition);
 	
+	diagnose().catch(err => console.error(err));
 	response.end();
 });
+
+//NHS Search API - GET request of the conditions pages
+async function diagnose() {
+	const endpoint = `https://api.nhs.uk/${condition}`
+	const options = {
+			headers: {
+				'Content-Type': 'application/json',
+				'subscription-key': process.env.NHS_API_KEY
+			}
+		}
+		
+ 	const response = await fetch(endpoint, options);
+  	const data = await response.json();
+ 	//console.log(data.mainEntityOfPage);
+}
