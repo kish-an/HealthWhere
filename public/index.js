@@ -1,3 +1,7 @@
+const symptomInputLanding = document.getElementById('symptoms');
+const symptomInputMain = document.getElementById('symptoms-header');
+const locationInput = document.getElementById('location');
+const submitBtn = document.getElementById('submit');
 let located = false;
 
 //Removes location input if user allows access to navigator geolocation
@@ -17,23 +21,18 @@ if ('geolocation' in navigator) {
 //Changes height of landing form and moves submit button up
 document.querySelector('.landing').addEventListener('transitionend', e => {
 	if (located && e.propertyName === 'transform') {
-		document.querySelector('.landing--container').style.height = '320px';
+		document.querySelector('.landing--container').style.height = 'calc(70% - 10vw)';
 		document.getElementById('submit').style.transform = 'translateY(-8rem)';
 	}
 });
 
-//Grabs value of symptoms when submit button is clicked
-const symptomInputLanding = document.getElementById('symptoms');
-const symptomInputMain = document.getElementById('symptoms-header');
-const locationInput = document.getElementById('location');
-const submitBtn = document.getElementById('submit');
-
+//Grabs value of symptoms when submit button is clicked or if enter is clicked
 submitBtn.addEventListener('click', function() {
 	console.log(symptomInputLanding.value);
 	showMap();
 	console.log(searchSymptoms(symptomInputLanding.value));
 });
-// or if enter is pressed
+
 document.addEventListener('keydown', function(e) {
 	if (e.key === 'Enter' && e.srcElement.id === 'symptoms') {
 		console.log(symptomInputLanding.value);
@@ -59,16 +58,6 @@ document.addEventListener('transitionend', function(e) {
 	}
 });
 
-//Google maps
-let map;
-
-function initMap() {
-	map = new google.maps.Map(document.getElementById('map'), {
-		center: { lat: -34.397, lng: 150.644 },
-		zoom: 8
-	});
-}
-
 //Grabs data from CSV file and adds it to symptoms array
 let symptomsAndLinks = [];
 let symptoms = [];
@@ -80,8 +69,6 @@ async function getSymptomList() {
 
 	symptomsAndLinks = list;
 	symptoms = list.map(el => el.replace(/,\/.+/g, ' ').trim());
-	console.log(symptomsAndLinks);
-	console.log(symptoms)
 }
 
 getSymptomList();
@@ -102,7 +89,6 @@ const searchSymptoms = searchText => {
 		symptomMatches = [];
 		document.querySelector('.symptom__list').innerHTML = '';
 	}
-
 	return symptomMatches;
 };
 
@@ -140,37 +126,118 @@ function grabSymptomSearch() {
 			document.querySelector('.symptom__list').innerHTML = '';
 			
 			//Grab condition from search bar 
-			const condition = e.target.innerText;
-			console.log(condition);
-			//Grab the conditions associated link
-			const conditionWithLink = symptomsAndLinks.filter(el => el.includes(`${condition}`));
+			const value = e.target.innerText;
 
-			//If an associated link is not found then search input value is sent to the server as the link
-			let link;
-			if (conditionWithLink.length > 0) {
-				link = /\/.+/g.exec(conditionWithLink)[0];
-			} else {
-				link = `conditions/${e.target.innerText.toLowerCase().split(' ').join('-')}`;
-			}
-
-			//Post data to the server
-			const data = { condition, link };
-
-			fetch('/api', {
-				method: 'POST',
-				headers: {
-					"Content-Type": 'application/json'
-				},
-				body: JSON.stringify(data)
-			});
-
+			diagnose(value);
 		})
 	);
 }
 
-
-document.addEventListener('keydown', function(e) {
+//Send value of search bar to server when enter is pressed 
+symptomInputMain.addEventListener('keydown', function(e) {
 	if (e.key === 'Enter') {
 		console.log(symptomInputMain.value);
+
+		//If users search matches more than 1 item than show a suggestions card 
+		if (searchSymptoms(symptomInputMain.value).length > 1) {
+			suggestions();
+		} else if (searchSymptoms(symptomInputMain.value).length === 1) {
+			const symptom = searchSymptoms(symptomInputMain.value)[0];
+			diagnose(symptom);
+		} else {
+			error();
+		}
+		//Removes dropdown autocomplete list
+		document.querySelector('.symptom__list').innerHTML = '';
 	}
 });
+
+function suggestions() {
+	//Show the suggestions card
+	const suggestions = document.querySelector('.suggestions');
+	suggestions.style.transform = 'translate(-50%, -50%) scale(1)';
+
+	//stop interaction with search bar
+	symptomInputMain.classList.add('overlay');
+
+	//Add all all matching conditions to the suggestions card
+	const array = searchSymptoms(symptomInputMain.value);
+	const html = array.map(el => `
+		<li class="suggestions__list__item">${el}</li>
+		`).join('');
+	document.querySelector('.suggestions__list').innerHTML = html;
+
+	//Close menu icon 
+	document.querySelector('.suggestions__close').addEventListener('click', () => {
+		suggestions.style.transform = 'translate(-50%, -50%) scale(0)';
+		symptomInputMain.classList.remove('overlay');
+	});
+
+	//Sends condition to server if a condition is clicked 
+	document.querySelectorAll('.suggestions__list__item').forEach(el => el.addEventListener('click', (e) => {
+		suggestions.style.transform = 'translate(-50%, -50%) scale(0)';
+		symptomInputMain.classList.remove('overlay');
+		symptomInputMain.value = e.target.innerText;
+		diagnose(e.target.innerText);
+	}));
+}
+
+function error() {
+	symptomInputMain.classList.add('overlay');
+	const error = document.querySelector('.error');
+	error.style.transform = 'translate(-50%, -50%) scale(1)';
+	document.querySelector('.error__close').addEventListener('click', () => {
+		error.style.transform = 'translate(-50%, -50%) scale(0)';
+		symptomInputMain.classList.remove('overlay');
+	});
+}
+
+async function diagnose(input) {
+	const condition = input;
+	//Grab the conditions associated link
+	const conditionWithLink = symptomsAndLinks.filter(el => el.includes(`${condition}`));
+
+	//If an associated link is not found then search input value is sent to the server as the link
+	let link;
+	if (conditionWithLink.length > 0) {
+		//Isolates link from symptomsAndLinks array
+		link = /\/.+/g.exec(conditionWithLink)[0];
+	} else {
+		link = `conditions/${e.target.innerText.toLowerCase().split(' ').join('-')}`;
+	}
+
+	//Post data to the server and receive condition response back
+	const data = { condition, link };
+	const response = await fetch('/api', {
+		method: 'POST',
+		headers: {
+			"Content-Type": 'application/json'
+		},
+		body: JSON.stringify(data)
+	});
+	const nhsResponse = await response.json();
+	conditionInfo(nhsResponse);
+}
+
+function conditionInfo(data) {
+	const conditionURL = data.url;
+	const conditionInfo = data.mainEntityOfPage;
+	const conditionInfoSummary = data.mainEntityOfPage[0].mainEntityOfPage[0].text;
+	const conditionInfoSymptoms = data.mainEntityOfPage[1].mainEntityOfPage;
+
+	console.log(conditionURL, conditionInfoSummary,'\n');
+	conditionInfoSymptoms.forEach(el => {
+		if (el.hasOwnProperty('text') && el['@type'] === 'WebPageElement') {
+			console.log(el.text);
+		}
+	});
+}
+
+//Google maps
+let map;
+function initMap() {
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: { lat: -34.397, lng: 150.644 },
+		zoom: 8
+	});
+}

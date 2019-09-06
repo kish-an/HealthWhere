@@ -9,9 +9,9 @@ require('dotenv').config();
 app.listen(3000, () => console.log('Listening at 3000'));
 app.use(express.static('public'));
 
+//Generate csv file of all symptoms from NHS Health A-Z
 const writeStream = fs.createWriteStream('public/health-a-to-z.csv');
 
-//Generate csv file of all symptoms from NHS Health A-Z
 function nhsScrape() {
 	request('https://www.nhs.uk/conditions/', (error, response, html) => {
 		if (!error && response.statusCode == 200) {
@@ -31,30 +31,22 @@ function nhsScrape() {
 
 nhsScrape();
 
-//Grab whatever condition the user entered from the client side 
+/* 1. Grab whatever condition the user entered from the client side 
+2. Fetch condition info from NHS Search API
+3. Send response info back to client */
 app.use(express.json({limit: '1mb'}));
 
-let condition;
-app.post('/api', (request, response) => {
-	console.log(request.body);
-	//Grab condition from the body and replace white spaces with hyphens
-	condition = request.body.link;
-	
-	diagnose().catch(err => console.error(err));
-	response.end();
-});
-
-//NHS Search API - GET request of the conditions pages
-async function diagnose() {
+app.post('/api', async (request, response) => {
+	const condition = request.body.link;
+	//NHS Search API - GET request of the conditions pages
 	const endpoint = `https://api.nhs.uk/${condition}`
 	const options = {
 			headers: {
 				'Content-Type': 'application/json',
 				'subscription-key': process.env.NHS_API_KEY
 			}
-		}
-		
- 	const response = await fetch(endpoint, options);
-  	const data = await response.json();
- 	//console.log(data.mainEntityOfPage);
-}
+		}	
+ 	const nhsResponse = await fetch(endpoint, options);
+  	const data = await nhsResponse.json();
+	response.json(data);
+});
