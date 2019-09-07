@@ -247,7 +247,7 @@ input:focus {
 	display: flex;
 	flex-direction: column;
 	position: absolute;
-	top: 3.9rem;
+	top: 3.3rem;
 	right: 49%;
 	transform: translate(50%);
 	width: 40%;
@@ -263,6 +263,7 @@ input:focus {
 	border-radius: 6px;
 	max-height: 26rem;
 	overflow: scroll;
+	display: none;
 }
 
 .symptom__list li {
@@ -463,6 +464,11 @@ input:focus {
 	display: block;
 }
 
+.condition__info h3 {
+	margin: 0;
+}
+
+
 .condition__info p {
 	margin: 0;
 	padding: 0;
@@ -476,7 +482,7 @@ input:focus {
 }
 
 .condition__links {
-	padding: 2rem;
+	padding: 1rem 2rem 2rem;
 }
 
 .condition__links p {

@@ -15,9 +15,9 @@
         <div class="landing--container">
             <h1 class="landing__title">Enter Your Details.</h1>
 
-            <div class="landing__form">
+            <form class="landing__form">
                 <div class="landing__form--container">
-                    <input type="text" placeholder="Whats wrong?" id="symptoms">
+                    <input type="text" placeholder="Whats wrong?" id="symptoms" required>
                     <ul class="symptom__list__landing"></ul>
                     <div class="landing__form__info">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="landing__form--container landing__form--location">
-                    <input type="text" placeholder="Enter your postcode." id="location">
+                    <input type="text" placeholder="Enter your postcode." id="location" required>
                     <div class="landing__form__info">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                             <path fill="none" d="M0 0h24v24H0V0z" />
@@ -42,8 +42,8 @@
                     </div>
                 </div>
 
-                <button type="button" id="submit">Submit</button>
-            </div>
+                <button type="submit" id="submit">Submit</button>
+            </form>
         </div>
     </div>
 
@@ -62,7 +62,7 @@
 
         <div class="attribution">
             <p class="attribution__text">Powered by</p>
-            <a class="attribution__link" target="_blank" href="https://developer.api.nhs.uk/">
+            <a class="attribution__link" target="_blank" href="https://www.nhs.uk/">
                 <svg version="1.1" viewBox="0 0 370.61 150" xmlns="http://www.w3.org/2000/svg"
                     xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"
                     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -79,7 +79,7 @@
             </a>
 
             <a class="attribution__link" target="_blank"
-                href="https://developers.google.com/maps/documentation/javascript/tutorial">
+                href="https://www.google.com/maps">
                 <svg class="attribution__gmaps"" xmlns:cc=" http://creativecommons.org/ns#"
                     viewBox="0 0 66.245834 67.248222">
                     <g inkscape:label="Capa 1" inkscape:groupmode="layer" id="layer1"
