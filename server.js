@@ -6,7 +6,8 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 require('dotenv').config();
 
-app.listen(3000, () => console.log('Listening at 3000'));
+const port = process.env.PORT || 3000;
+app.listen(3000, () => console.log(`Starting server at ${port}`));
 app.use(express.static('public'));
 
 //Generate csv file of all symptoms from NHS Health A-Z
