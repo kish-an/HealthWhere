@@ -216,22 +216,42 @@ async function diagnose(input) {
 		body: JSON.stringify(data)
 	});
 	const nhsResponse = await response.json();
-	conditionInfo(nhsResponse);
+	displayConditionInfo(nhsResponse, condition);
 }
 
-function conditionInfo(data) {
-	const conditionURL = data.url;
-	const conditionInfo = data.mainEntityOfPage;
+function displayConditionInfo(data, condition) {
+	const conditionURL = data.url.replace('api', 'www');
 	const conditionInfoSummary = data.mainEntityOfPage[0].mainEntityOfPage[0].text;
-	const conditionInfoSymptoms = data.mainEntityOfPage[1].mainEntityOfPage;
+	let conditionInfoSymptoms;
 
-	console.log(conditionURL, conditionInfoSummary,'\n');
-	conditionInfoSymptoms.forEach(el => {
-		if (el.hasOwnProperty('text') && el['@type'] === 'WebPageElement') {
-			console.log(el.text);
-		}
+	try {
+		conditionInfoSymptoms = data.mainEntityOfPage[1].mainEntityOfPage;
+	} catch {
+		if (conditionInfoSymptoms) error();
+	}
+	let infoArray = [];
+	if (conditionInfoSymptoms) {
+		conditionInfoSymptoms.forEach(el => {
+			if (el.hasOwnProperty('text') && el['@type'] === 'WebPageElement') {
+				infoArray.push(el.text);
+			}
+		});
+	}
+	const conditionPopUp = document.querySelector('.condition');
+	conditionPopUp.style.transform = 'translate(-50%, -50%) scale(1)';
+	symptomInputMain.classList.add('overlay');
+	document.querySelector('.condition__title').textContent = condition;
+	document.querySelector('.condition__summary').innerHTML = conditionInfoSummary;
+	const html = infoArray.map(el => `<div class="condition__info__item">${el}</div>`).join('');
+	document.querySelector('.condition__info').innerHTML = html;
+	document.querySelector('.condition__link').setAttribute('href', `${conditionURL}`);
+	document.querySelector('.condition__link').innerText = conditionURL;
+	document.querySelector('.condition__close').addEventListener('click', () => {
+		symptomInputMain.classList.remove('overlay');
+		conditionPopUp.style.transform = 'translate(-50%, -50%) scale(0)'
 	});
 }
+
 
 //Google maps
 let map;
