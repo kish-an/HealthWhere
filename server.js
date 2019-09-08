@@ -7,7 +7,7 @@ const fetch = require('node-fetch');
 require('dotenv').config();
 
 const port = process.env.PORT || 3000;
-app.listen(3000, () => console.log(`Starting server at ${port}`));
+app.listen(port, () => console.log(`Starting server at ${port}`));
 app.use(express.static('public'));
 
 //Generate csv file of all symptoms from NHS Health A-Z
@@ -24,8 +24,6 @@ function nhsScrape() {
 
 				writeStream.write(`${symptom},${link}\n`);
 			});
-
-			console.log('Scraping done.');
 		}
 	});
 }
