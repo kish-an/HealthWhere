@@ -1,7 +1,6 @@
 const symptomInputLanding = document.getElementById('symptoms');
 const symptomInputMain = document.getElementById('symptoms-header');
 const locationInput = document.getElementById('location');
-const submitBtn = document.getElementById('submit');
 let located = false;
 
 //Removes location input if user allows access to navigator geolocation
@@ -13,6 +12,7 @@ if ('geolocation' in navigator) {
 				.querySelector('.landing__form--location')
 				.classList.toggle('located');
 			located = true;
+			document.getElementById('location').removeAttribute("required");
 			console.log(position);
 		},
 		() => console.log('geolocation not available')
@@ -26,18 +26,20 @@ document.querySelector('.landing').addEventListener('transitionend', e => {
 	}
 });
 
-//Grabs value of symptoms when submit button is clicked or if enter is clicked
-submitBtn.addEventListener('click', function() {
-	console.log(symptomInputLanding.value);
+//Handles submit button being clicked on landing page
+document.getElementById('landing-form').addEventListener('submit', function(e) {
+	e.preventDefault();
 	showMap();
-	console.log(searchSymptoms(symptomInputLanding.value));
-});
-
-document.addEventListener('keydown', function(e) {
-	if (e.key === 'Enter' && e.srcElement.id === 'symptoms') {
-		console.log(symptomInputLanding.value);
-		showMap();
-	}
+	setTimeout(() => {
+		if (searchSymptoms(symptomInputLanding.value).length > 1) {
+			suggestions();
+		} else if (searchSymptoms(symptomInputLanding.value).length === 1) {
+			const symptom = searchSymptoms(symptomInputLanding.value)[0];
+			diagnose(symptom);
+		} else {
+			error();
+		}
+	}, 500)
 });
 
 function showMap() {
@@ -49,6 +51,7 @@ function showMap() {
 	//Show header symptom bar and put map above body again
 	document.getElementById('symptoms-header').value = symptomInputLanding.value;
 	document.getElementById('symptoms-header').style.display = 'inline-block';
+	document.querySelector('.symptom__list').style.display = 'inline-block';
 }
 
 //Removes landing page from document flow
@@ -96,13 +99,8 @@ const searchSymptoms = searchText => {
 const outputHtml = symptomMatches => {
 	if (symptomMatches.length > 0) {
 		const html = symptomMatches
-			.map(
-				match => `
-			<li class="symptom__list__item">${match}</li>
-			`
-			)
+			.map(match => `<li class="symptom__list__item">${match}</li>`)
 			.join('');
-
 		document.querySelector('.symptom__list').innerHTML = html;
 	}
 };
@@ -136,8 +134,6 @@ function grabSymptomSearch() {
 //Send value of search bar to server when enter is pressed 
 symptomInputMain.addEventListener('keydown', function(e) {
 	if (e.key === 'Enter') {
-		console.log(symptomInputMain.value);
-
 		//If users search matches more than 1 item than show a suggestions card 
 		if (searchSymptoms(symptomInputMain.value).length > 1) {
 			suggestions();
@@ -223,12 +219,13 @@ function displayConditionInfo(data, condition) {
 	const conditionURL = data.url.replace('api', 'www');
 	const conditionInfoSummary = data.mainEntityOfPage[0].mainEntityOfPage[0].text;
 	let conditionInfoSymptoms;
-
+	//See if data contains symptom information
 	try {
 		conditionInfoSymptoms = data.mainEntityOfPage[1].mainEntityOfPage;
 	} catch {
 		if (conditionInfoSymptoms) error();
 	}
+	//Loop through NHS API data and if they contain applicable text then push it to infoArray
 	let infoArray = [];
 	if (conditionInfoSymptoms) {
 		conditionInfoSymptoms.forEach(el => {
@@ -237,6 +234,7 @@ function displayConditionInfo(data, condition) {
 			}
 		});
 	}
+	//Condition pop-up UI 
 	const conditionPopUp = document.querySelector('.condition');
 	conditionPopUp.style.transform = 'translate(-50%, -50%) scale(1)';
 	symptomInputMain.classList.add('overlay');

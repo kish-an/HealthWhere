@@ -139,6 +139,10 @@ input:focus {
 	border-radius: 6px;
 }
 
+.landing__form input:focus, #symptoms-header:focus {
+	border: 3px solid rgba(0, 114, 206, 0.65);
+}
+
 .landing__form button {
 	display: block;
 	background: #0072ce;
