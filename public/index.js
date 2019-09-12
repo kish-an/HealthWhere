@@ -267,6 +267,18 @@ function displayConditionInfo(data, condition) {
 	});
 }
 
+async function getServices(location) {
+	const response = await fetch('/services', {
+		method: 'POST',
+		headers: {
+			"Content-Type": 'application/json'
+		},
+		body: JSON.stringify(location)
+	});
+	const services = await response.json();
+	services.value.forEach(el => placeMarker(el.Longitude, el.Latitude, el.Postcode));
+}
+
 //Mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoibGV0c2p1c3RqdW1waW50b2l0IiwiYSI6ImNrMGNxbG9vOTAwNDUzcHM1bGlseGNvd3EifQ.1TgakHM0JVuPRoeecqkrLw';
 const map = new mapboxgl.Map({

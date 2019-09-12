@@ -35,7 +35,7 @@ nhsScrape();
 3. Send response info back to client */
 app.use(express.json({limit: '1mb'}));
 
-app.post('/api', async (request, response) => {
+app.post('/condition', async (request, response) => {
 	const condition = request.body.link;
 	//NHS Search API - GET request of the conditions pages
 	const endpoint = `https://api.nhs.uk/${condition}`
@@ -48,4 +48,28 @@ app.post('/api', async (request, response) => {
  	const nhsResponse = await fetch(endpoint, options);
   	const data = await nhsResponse.json();
 	response.json(data);
+});
+
+app.post('/services', async (request, response) => {
+	//Extract latitude and longitude 
+	const long = request.body.long;
+	const lat = request.body.lat;
+
+	//NHS Services Search API - POST request of the service search page 
+	let data = {
+		"orderby": `geo.distance(Geocode, geography'POINT(${long} ${lat})')`,
+		"top": 5,
+		"skip": 0,
+		"count": true
+	}
+	const info = await fetch('https://api.nhs.uk/service-search/search?api-version=1', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'subscription-key': 'ce8c296627214e63a94bd57055361c17'
+		},
+		body: JSON.stringify(data)
+	});
+	const services = await info.json();
+	response.json(services);
 });
