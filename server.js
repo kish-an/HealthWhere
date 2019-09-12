@@ -66,7 +66,7 @@ app.post('/services', async (request, response) => {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'subscription-key': 'ce8c296627214e63a94bd57055361c17'
+			'subscription-key': process.env.NHS_API_KEY
 		},
 		body: JSON.stringify(data)
 	});
