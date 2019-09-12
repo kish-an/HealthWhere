@@ -17,6 +17,7 @@ if ('geolocation' in navigator) {
 				long: position.coords.longitude,
 				lat: position.coords.latitude
 			}
+			getServices(location);
 		}
 	);
 }
@@ -39,7 +40,7 @@ document.getElementById('landing-form').addEventListener('submit', async functio
 		const response = await fetch(`https://api.postcodes.io/postcodes/${locationInput.value}`);
 		const location = await response.json();
 		map.flyTo({center: [location.result.longitude, location.result.latitude], zoom: 14});
-		waitTime = 3000;
+		waitTime = 2800;
 	} else {
 		//Map will have already loaded so speed up time to show popup
 		waitTime = 250;
@@ -289,3 +290,39 @@ const map = new mapboxgl.Map({
 });
 // Add zoom and rotation controls to the map.
 map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+function placeMarker(long, lat, id) {
+	/* Image: An image is loaded and added to the map. */
+	map.loadImage("https://i.imgur.com/MK4NUzI.png", function(error, image) {
+	  if (error) throw error;
+
+	  if (typeof map.getLayer(`${id}`) === 'undefined') {
+		  map.addImage("custom-marker", image);
+		  /* Style layer: A style layer ties together the source and image and specifies how they are displayed on the map. */
+		  map.addLayer({
+			  id: `${id}`,
+			  type: "symbol",
+			  /* Source: A data source specifies the geographic coordinate where the image marker gets placed. */
+			  source: {
+				  type: "geojson",
+				  data: {
+				  type: 'FeatureCollection',
+				  features: [
+					  {
+					  type: 'Feature',
+					  properties: {},
+					  geometry: {
+						  type: "Point",
+						  coordinates: [long, lat]
+					  }
+					  }
+				  ]
+				  }
+			  },
+			  layout: {
+				  "icon-image": "custom-marker",
+			  }
+		  });
+	  } 	
+	});
+}
