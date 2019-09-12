@@ -58,7 +58,7 @@ app.post('/services', async (request, response) => {
 	//NHS Services Search API - POST request of the service search page 
 	let data = {
 		"orderby": `geo.distance(Geocode, geography'POINT(${long} ${lat})')`,
-		"top": 5,
+		"top": 20,
 		"skip": 0,
 		"count": true
 	}
