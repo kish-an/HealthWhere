@@ -5,7 +5,6 @@ let located = false;
 
 //Removes location input if user allows access to navigator geolocation
 if ('geolocation' in navigator) {
-	console.log('geolocation available');
 	navigator.geolocation.getCurrentPosition(
 		position => {
 			document
@@ -13,9 +12,12 @@ if ('geolocation' in navigator) {
 				.classList.toggle('located');
 			located = true;
 			document.getElementById('location').removeAttribute("required");
-			console.log(position);
-		},
-		() => console.log('geolocation not available')
+			map.flyTo({center: [position.coords.longitude, position.coords.latitude], zoom: 14});
+			const location = {
+				long: position.coords.longitude,
+				lat: position.coords.latitude
+			}
+		}
 	);
 }
 //Changes height of landing form and moves submit button up
@@ -27,9 +29,23 @@ document.querySelector('.landing').addEventListener('transitionend', e => {
 });
 
 //Handles submit button being clicked on landing page
-document.getElementById('landing-form').addEventListener('submit', function(e) {
+document.getElementById('landing-form').addEventListener('submit', async function(e) {
 	e.preventDefault();
 	showMap();
+	let waitTime;
+
+	//Center map on postcode input (if geolocation is not available)
+	if (locationInput.hasAttribute('required')) {
+		const response = await fetch(`https://api.postcodes.io/postcodes/${locationInput.value}`);
+		const location = await response.json();
+		map.flyTo({center: [location.result.longitude, location.result.latitude], zoom: 14});
+		waitTime = 3000;
+	} else {
+		//Map will have already loaded so speed up time to show popup
+		waitTime = 250;
+	}
+
+	//Condition search
 	setTimeout(() => {
 		if (searchSymptoms(symptomInputLanding.value).length > 1) {
 			suggestions();
@@ -39,13 +55,14 @@ document.getElementById('landing-form').addEventListener('submit', function(e) {
 		} else {
 			error();
 		}
-	}, 500)
+	}, waitTime)
 });
 
 function showMap() {
 	//Removes landing screen
 	document.querySelector('.landing').style.transform = 'translateY(-100%)';
-	document.querySelector('header').style.transform = 'translateY(-90vh)';
+	document.querySelector('header').style.top = '0';
+	document.querySelector('header').style.height = '5rem';
 	document.querySelector('body').style.display = 'block';
 
 	//Show header symptom bar and put map above body again
@@ -204,7 +221,7 @@ async function diagnose(input) {
 
 	//Post data to the server and receive condition response back
 	const data = { condition, link };
-	const response = await fetch('/api', {
+	const response = await fetch('/condition', {
 		method: 'POST',
 		headers: {
 			"Content-Type": 'application/json'
@@ -250,12 +267,13 @@ function displayConditionInfo(data, condition) {
 	});
 }
 
-
-//Google maps
-let map;
-function initMap() {
-	map = new google.maps.Map(document.getElementById('map'), {
-		center: { lat: -34.397, lng: 150.644 },
-		zoom: 8
-	});
-}
+//Mapbox
+mapboxgl.accessToken = 'pk.eyJ1IjoibGV0c2p1c3RqdW1waW50b2l0IiwiYSI6ImNrMGNxbG9vOTAwNDUzcHM1bGlseGNvd3EifQ.1TgakHM0JVuPRoeecqkrLw';
+const map = new mapboxgl.Map({
+	container: 'map',
+	style: 'mapbox://styles/mapbox/streets-v11',
+	center: [-0.118092, 51.509865],
+	zoom: 8
+});
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl(), 'top-right');

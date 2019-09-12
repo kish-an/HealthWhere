@@ -67,6 +67,10 @@ input:focus {
 	outline-color: #0072ce;
 }
 
+.mapboxgl-ctrl-top-right {
+	padding: 5rem 0;
+}
+
 /* Landing page styles */
 .landing {
 	background: #0072ce;
@@ -87,6 +91,7 @@ input:focus {
 	align-items: center;
 	grid-row: 1 / 2;
 	transition: all 0.6s ease;
+	z-index: 2;
 }
 
 .landing--container {
@@ -95,7 +100,7 @@ input:focus {
 	width: 50%;
 	height: calc(80% - 5vw);
 	min-height: 50%;
-	z-index: 1;
+	z-index: 3;
 	box-shadow: 0 3px 1px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 	transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	overflow: hidden;
@@ -225,8 +230,9 @@ input:focus {
 	height: 3.5rem;
 }
 
-.attribution__gmaps {
-	width: 2rem !important;
+.attribution__mapbox {
+	width: 6rem !important;
+	fill: white;
 }
 
 .attribution__link {
@@ -251,8 +257,8 @@ input:focus {
 	display: flex;
 	flex-direction: column;
 	position: absolute;
-	top: 3.3rem;
-	right: 49%;
+	top: 3rem;
+	right: 51%;
 	transform: translate(50%);
 	width: 40%;
 	list-style: none;
@@ -284,17 +290,13 @@ input:focus {
 }
 
 /* Map styles */
-.gmap {
-	height: 100%;
-	top: 0;
-	left: 0;
-	width: 100%;
-}
-
 #map {
 	height: 100%;
-	margin: 0;
-	padding: 0;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1
 }
 
 /* General pop-up styles */
