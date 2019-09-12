@@ -38,9 +38,14 @@ document.getElementById('landing-form').addEventListener('submit', async functio
 	//Center map on postcode input (if geolocation is not available)
 	if (locationInput.hasAttribute('required')) {
 		const response = await fetch(`https://api.postcodes.io/postcodes/${locationInput.value}`);
-		const location = await response.json();
-		map.flyTo({center: [location.result.longitude, location.result.latitude], zoom: 14});
-		waitTime = 2800;
+		const data = await response.json();
+		const location = {
+			long: data.result.longitude,
+			lat: data.result.latitude
+		}
+		map.flyTo({center: [location.long, location.lat], zoom: 14});
+		getServices(location);
+		waitTime = 3000;
 	} else {
 		//Map will have already loaded so speed up time to show popup
 		waitTime = 250;
@@ -277,7 +282,10 @@ async function getServices(location) {
 		body: JSON.stringify(location)
 	});
 	const services = await response.json();
-	services.value.forEach(el => placeMarker(el.Longitude, el.Latitude, el.Postcode));
+	services.value.forEach(el => {
+		placeMarker(el.Longitude, el.Latitude, el.Postcode);
+		markerPopup(el, el.Postcode);
+	});
 }
 
 //Mapbox
@@ -296,28 +304,28 @@ function placeMarker(long, lat, id) {
 	map.loadImage("https://i.imgur.com/MK4NUzI.png", function(error, image) {
 	  if (error) throw error;
 
-	  if (typeof map.getLayer(`${id}`) === 'undefined') {
+	  if (typeof map.getLayer(id) === 'undefined') {
 		  map.addImage("custom-marker", image);
 		  /* Style layer: A style layer ties together the source and image and specifies how they are displayed on the map. */
 		  map.addLayer({
-			  id: `${id}`,
+			  id: id,
 			  type: "symbol",
 			  /* Source: A data source specifies the geographic coordinate where the image marker gets placed. */
 			  source: {
 				  type: "geojson",
 				  data: {
-				  type: 'FeatureCollection',
-				  features: [
-					  {
-					  type: 'Feature',
-					  properties: {},
-					  geometry: {
-						  type: "Point",
-						  coordinates: [long, lat]
-					  }
-					  }
-				  ]
-				  }
+					type: 'FeatureCollection',
+					features: [
+						{
+						type: 'Feature',
+						properties: {},
+						geometry: {
+							type: "Point",
+							coordinates: [long, lat]
+						}
+						}
+					]
+				}
 			  },
 			  layout: {
 				  "icon-image": "custom-marker",
@@ -325,4 +333,51 @@ function placeMarker(long, lat, id) {
 		  });
 	  } 	
 	});
+}
+
+function markerPopup(info, id) {
+		//Marker popup 
+		const popup = new mapboxgl.Popup({
+			closeButton: false,
+			closeOnClick: false
+		});
+	
+		map.on('mouseenter', id, function(e) {
+			// Change the cursor style as a UI indicator.
+			map.getCanvas().style.cursor = 'pointer';
+			 
+			const coordinates = e.features[0].geometry.coordinates.slice();
+			const description = `
+			<h2>${info.OrganisationName}</h2> | <h3>(${info.OrganisationType})</h3>
+			<p>${info.Address1 ? `${info.Address1},` : ''}
+			${info.Address2 ? `${info.Address2},` : ''} ${info.Address3 ? `${info.Address3}` : ''}</p>
+			<p>${info.Postcode}</p>
+			<br>
+			<a href='${info.URL}' target='_blank'>${info.URL ? `${info.URL}` : ''}</a>
+			`; 
+			 
+			// Ensure that if the map is zoomed out such that multiple
+			// copies of the feature are visible, the popup appears
+			// over the copy being pointed to.
+			while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+			coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+			}
+			
+			// Populate the popup and set its coordinates
+			// based on the feature found.
+			popup.setLngLat(coordinates)
+			.setHTML(description)
+			.addTo(map);
+		});
+
+		map.on('click', id, function(e) {
+			if (info.URL) {
+				window.open(info.URL);
+			}
+		});
+			 
+		map.on('mouseleave', id, function() {
+			map.getCanvas().style.cursor = '';
+			popup.remove();
+		});
 }

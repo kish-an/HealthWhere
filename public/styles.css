@@ -67,10 +67,6 @@ input:focus {
 	outline-color: #0072ce;
 }
 
-.mapboxgl-ctrl-top-right {
-	padding: 5rem 0;
-}
-
 /* Landing page styles */
 .landing {
 	background: #0072ce;
@@ -297,6 +293,40 @@ input:focus {
 	top: 0;
 	left: 0;
 	z-index: 1
+}
+
+.mapboxgl-ctrl-top-right {
+	padding: 5rem 0;
+}
+
+.mapboxgl-popup {
+	color: #0072ce;
+	max-width: 800px !important;
+}
+
+.mapboxgl-popup h2 {
+	color: #005eb8;
+	font-weight: 800;
+}
+
+.mapboxgl-popup p {
+	font-weight: 400;
+	display: block;
+}
+
+.mapboxgl-popup h2, h3, p {
+	display: inline-block;
+	margin: 0.1rem;
+}
+
+.mapboxgl-popup a {
+	text-decoration: none;
+	transition: all 0.6s ease;
+	color: #0072ce;
+}
+
+.mapboxgl-popup a:hover {
+	color: #005eb8;
 }
 
 /* General pop-up styles */
