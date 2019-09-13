@@ -301,7 +301,7 @@ map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
 function placeMarker(long, lat, id) {
 	/* Image: An image is loaded and added to the map. */
-	map.loadImage("https://i.imgur.com/MK4NUzI.png", function(error, image) {
+	map.loadImage("http://i.imgur.com/qR9ekBa.png", function(error, image) {
 	  if (error) throw error;
 
 	  if (typeof map.getLayer(id) === 'undefined') {
