@@ -214,7 +214,8 @@ function error() {
 async function diagnose(input) {
 	const condition = input;
 	//Grab the conditions associated link
-	const conditionWithLink = symptomsAndLinks.filter(el => el.includes(`${condition}`));
+	const regex = new RegExp(`^(${condition}),\/.+`, 'gi');
+	const conditionWithLink = symptomsAndLinks.filter(el => el.match(regex));
 
 	//If an associated link is not found then search input value is sent to the server as the link
 	let link;
