@@ -212,18 +212,21 @@ function error() {
 }
 
 async function diagnose(input) {
-	const condition = input;
+	const condition = escapeRegExp(input);
+	function escapeRegExp(string) {
+		return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+	}
 	//Grab the conditions associated link
 	const regex = new RegExp(`^(${condition}),\/.+`, 'gi');
 	const conditionWithLink = symptomsAndLinks.filter(el => el.match(regex));
 
-	//If an associated link is not found then search input value is sent to the server as the link
+	//If an associated link is not found then display error popup
 	let link;
 	if (conditionWithLink.length > 0) {
 		//Isolates link from symptomsAndLinks array
 		link = /\/.+/g.exec(conditionWithLink)[0];
 	} else {
-		link = `conditions/${e.target.innerText.toLowerCase().split(' ').join('-')}`;
+		return error();
 	}
 
 	//Post data to the server and receive condition response back
